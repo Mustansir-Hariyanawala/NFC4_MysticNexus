@@ -640,7 +640,8 @@ const CHAT_APIS = {
   createNewChat,
   getLatestHistoryItem,
   deleteChatById,
-  updateChatTitle
+  updateChatTitle,
+  uploadDocuments
 };
 
 export default CHAT_APIS;
