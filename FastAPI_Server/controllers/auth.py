@@ -12,18 +12,20 @@ class AuthController:
     async def login(self, login_data: UserLogin) -> dict:
         """Handle user login"""
         try:
-            # Find user by username
-            user_doc = await self.collection.find_one({"username": login_data.username})
+            print("User data Recieved : ", login_data)
+
+            # Find user by email
+            user_doc = await self.collection.find_one({"email": login_data.email})
             if not user_doc:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Invalid username or password"
+                    detail="Invalid email or password"
                 )
             
-            # Verify password
+            # Verify password using email for salting
             is_valid = verify_password(
                 login_data.password,
-                user_doc["username"],
+                user_doc["email"],  # Use email for salting
                 user_doc["salt"],
                 user_doc["password_hash"]
             )
@@ -43,9 +45,8 @@ class AuthController:
                     "email": user_doc["email"]
                 }
             }
-        except HTTPException:
-            raise
         except Exception as e:
+            print("Error : ", e)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=str(e)
@@ -70,8 +71,8 @@ class AuthController:
                     detail="Email already exists"
                 )
             
-            # Generate password hash
-            salt, password_hash = generate_password_hash(signup_data.username, signup_data.password)
+            # Generate password hash using email for salting
+            salt, password_hash = generate_password_hash(signup_data.email, signup_data.password)
             
             # Create user document
             user_doc = {

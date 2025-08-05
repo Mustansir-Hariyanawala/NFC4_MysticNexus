@@ -3,12 +3,12 @@ import secrets
 import base64
 from typing import Tuple
 
-def generate_password_hash(username: str, password: str) -> Tuple[str, str]:
+def generate_password_hash(email: str, password: str) -> Tuple[str, str]:
     """
     Generates a password hash and salt.
     
     Args:
-        username: The username
+        email: The email address
         password: The password
         
     Returns:
@@ -21,7 +21,7 @@ def generate_password_hash(username: str, password: str) -> Tuple[str, str]:
     password_hash = hashlib.pbkdf2_hmac(
         'sha512',
         password.encode('utf-8'),
-        (salt + username + ":").encode('utf-8'),
+        (salt + email + ":").encode('utf-8'),
         1000,
         64
     )
@@ -31,13 +31,13 @@ def generate_password_hash(username: str, password: str) -> Tuple[str, str]:
     
     return salt, password_hash_b64
 
-def verify_password(password: str, username: str, salt: str, stored_hash: str) -> bool:
+def verify_password(password: str, email: str, salt: str, stored_hash: str) -> bool:
     """
     Verify a password against a stored hash.
     
     Args:
         password: The password to verify
-        username: The username
+        email: The email
         salt: The stored salt
         stored_hash: The stored password hash
         
@@ -48,7 +48,7 @@ def verify_password(password: str, username: str, salt: str, stored_hash: str) -
     password_hash = hashlib.pbkdf2_hmac(
         'sha512',
         password.encode('utf-8'),
-        (salt + username + ":").encode('utf-8'),
+        (salt + email + ":").encode('utf-8'),
         1000,
         64
     )

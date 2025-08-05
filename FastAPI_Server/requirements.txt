@@ -1,8 +1,31 @@
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-motor==3.3.2
-pymongo==4.6.0
-pydantic==2.5.0
-python-dotenv==1.0.0
+# Mongo Server - CURRENT INSTALLED VERSIONS
+numpy==2.3.2
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+motor==3.7.1
+pymongo==4.13.2
+pydantic==2.11.7
+python-dotenv==1.1.1
+python-multipart==0.0.20
+pydantic[email]
+python-jose[cryptography]==3.5.0
 passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
+bcrypt==4.3.0
+
+# ChromaDB for vector storage
+chromadb==1.0.15
+
+# Document processing - Mustan
+langchain-core=0.3.72
+langchain=0.3.27
+langchain_community=0.3.27
+langchain_huggingface=0.3.1
+python-docx==1.2.0
+
+# Doc Processing - Sonnet
+nltk=3.9.1
+sentence-transformers=5.0.0
+PyPDF2=3.0.1
+
+# # LangGraph RAG Pipeline - FIXED VERSIONS
+langgraph=0.6.3

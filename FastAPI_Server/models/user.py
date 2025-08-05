@@ -70,11 +70,11 @@ class UserInDB(UserBase):
     )
 
 class UserLogin(BaseModel):
-    username: str = Field(..., min_length=1)
+    email: str = Field(..., min_length=1)
     password: str = Field(..., min_length=1)
 
 class ChangePassword(BaseModel):
-    username: str = Field(..., min_length=1)
+    email: str = Field(..., min_length=1)
     new_password: str = Field(..., min_length=6, alias="newPassword")
 
     model_config = ConfigDict(populate_by_name=True)

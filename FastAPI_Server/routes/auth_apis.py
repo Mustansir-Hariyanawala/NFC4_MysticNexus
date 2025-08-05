@@ -10,6 +10,7 @@ def get_auth_controller():
 @router.post("/login")
 async def login(login_data: UserLogin, controller: AuthController = Depends(get_auth_controller)):
     """Login endpoint"""
+    print(f"Login attempt for user: {login_data}")
     return await controller.login(login_data)
 
 @router.post("/signup")

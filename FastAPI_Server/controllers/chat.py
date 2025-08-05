@@ -6,6 +6,7 @@ from models.chat import (
     AddResponseRequest, UpdateChatStatusRequest, HistoryEntry, 
     Prompt, Response, ChatStatus, PyObjectId
 )
+from config.chromadb import create_chat_collection, delete_chat_collection
 
 if TYPE_CHECKING:
     from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -37,6 +38,10 @@ class ChatController:
             # Insert chat into database
             chat_dict = chat.model_dump(by_alias=True, exclude={"id"})
             result = await self.chat_collection.insert_one(chat_dict)
+            
+            # Create ChromaDB collection for this chat
+            chat_id_str = str(result.inserted_id)
+            await create_chat_collection(chat_id_str, user_id)
             
             # Update user's chat_ids
             await self.user_collection.update_one(
@@ -212,7 +217,7 @@ class ChatController:
             raise Exception(f"Error updating chat status: {str(e)}")
 
     async def delete_chat(self, chat_id: str, user_id: str) -> bool:
-        """Delete a chat"""
+        """Delete a chat and its ChromaDB collection"""
         try:
             chat_object_id = PyObjectId(chat_id)
             user_object_id = PyObjectId(user_id)
@@ -225,6 +230,9 @@ class ChatController:
             
             if not chat:
                 return False
+            
+            # Delete ChromaDB collection for this chat
+            await delete_chat_collection(chat_id)
             
             # Remove chat from user's chat_ids
             await self.user_collection.update_one(
