@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config.mongodb import connect_to_mongo, close_mongo_connection
 from routes.auth_apis import router as auth_router
 from routes.user_apis import router as user_router
+from routes.chat_apis import router as chat_router
 import uvicorn
 import os
 
@@ -24,6 +25,7 @@ app.add_middleware(
 # Include routers
 app.include_router(auth_router, prefix="/api", tags=["Authentication"])
 app.include_router(user_router, prefix="/api/users", tags=["Users"])
+app.include_router(chat_router, tags=["Chats"])
 
 @app.get("/")
 async def root():

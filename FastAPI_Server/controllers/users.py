@@ -98,6 +98,7 @@ class UserController:
             user_doc = {
                 "username": user_data.username,
                 "email": user_data.email,
+                "chat_ids": [],  # Initialize empty chat_ids list
                 "salt": salt,
                 "password_hash": password_hash,
                 "created_at": datetime.utcnow(),

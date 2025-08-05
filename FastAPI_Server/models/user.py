@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, EmailStr, ConfigDict, GetJsonSchemaHandler
-from typing import Optional, Any
+from typing import Optional, Any, List
 from datetime import datetime
 from bson import ObjectId
 from pydantic_core import core_schema
@@ -45,6 +45,7 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
+    chat_ids: List[PyObjectId] = Field(default_factory=list, description="List of chat IDs associated with the user")
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -56,6 +57,7 @@ class UserResponse(UserBase):
 
 class UserInDB(UserBase):
     id: Optional[PyObjectId] = Field(default_factory=PyObjectId, alias="_id")
+    chat_ids: List[PyObjectId] = Field(default_factory=list, description="List of chat IDs associated with the user")
     salt: str
     password_hash: str
     created_at: Optional[datetime] = None
