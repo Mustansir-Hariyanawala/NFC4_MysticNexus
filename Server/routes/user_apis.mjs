@@ -1,5 +1,5 @@
 import express from 'express';
-import USER_FNS from '../controllers/users.mjs';
+import USER_FNS from '../controllers/users_controller.mjs';
 
 const router = express.Router();
 

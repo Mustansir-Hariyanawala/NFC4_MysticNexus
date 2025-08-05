@@ -1,4 +1,6 @@
-import Chat from '../models/chat.mjs';
+import Chat from '../models/chat_model.mjs';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Get all chats with basic information only
@@ -155,7 +157,7 @@ export const getChatById = async (req, res) => {
  */
 export const createNewChat = async (req, res) => {
   try {
-    const { userId, title } = req.body;
+    const { userId } = req.body;
 
     // Validate required fields
     if (!userId) {
@@ -165,17 +167,9 @@ export const createNewChat = async (req, res) => {
       });
     }
 
-    if (!title || title.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: 'Chat title is required'
-      });
-    }
-
     // Create new chat
     const newChat = new Chat({
       userId,
-      title: title.trim(),
       history: [], // Start with empty history
       docChunkIds: docChunkIds || [] // Include docChunkIds if provided, otherwise empty array
     });
@@ -210,8 +204,6 @@ export const createNewChat = async (req, res) => {
     });
   }
 };
-
-// ...existing code...
 
 /**
  * Append a new prompt to chat history
@@ -466,3 +458,190 @@ export const getLatestHistoryItem = async (req, res) => {
     });
   }
 };
+
+/**
+ * Delete a chat by chatId
+ * Removes the chat document from the database
+ * @param {Object} req - Express request object (expects chatId in params)
+ * @param {Object} res - Express response object
+ */
+export const deleteChatById = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+
+    if (!chatId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Chat ID is required'
+      });
+    }
+
+    // Attempt to delete the chat
+    const deletedChat = await Chat.findByIdAndDelete(chatId).lean();
+
+    if (!deletedChat) {
+      return res.status(404).json({
+        success: false,
+        message: 'Chat not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Chat deleted successfully',
+      data: {
+        chatId: deletedChat._id
+      }
+    });
+
+  } catch (error) {
+    console.error('Error deleting chat:', error);
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete chat',
+      error: error.message
+    });
+  }
+};
+
+/**
+ * Update the title of a chat by chatId
+ * Updates the title field of the specified chat
+ * @param {Object} req - Express request object (expects chatId in params, new title in body)
+ * @param {Object} res - Express response object
+ */
+export const updateChatTitle = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+    const { title } = req.body;
+
+    // Validate required fields
+    if (!chatId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Chat ID is required'
+      });
+    }
+
+    if (!title || title.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Title is required'
+      });
+    }
+
+    // Update the chat title
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      { 
+        $set: { title: title.trim() }
+      },
+      { new: true, runValidators: true }
+    ).lean();
+
+    if (!updatedChat) {
+      return res.status(404).json({
+        success: false,
+        message: 'Chat not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Chat title updated successfully',
+      data: {
+        chatId: updatedChat._id,
+        title: updatedChat.title,
+        updatedAt: updatedChat.updatedAt
+      }
+    });
+
+  } catch (error) {
+    console.error('Error updating chat title:', error);
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update chat title',
+      error: error.message
+    });
+  }
+};
+
+
+/**
+ * Upload multiple documents to the server
+ * Processes the incoming documents and stores them in the ../tempData folder
+ * @param {Object} req - Express request object (expects files in req.files from multer)
+ * @param {Object} res - Express response object
+ */
+export const uploadDocuments = async (req, res) => {
+  try {
+    // Check if files are provided (multer will populate req.files)
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'No files provided'
+      });
+    }
+
+    const uploadedFiles = [];
+
+    // Process each uploaded file
+    for (const file of req.files) {
+      const fileInfo = {
+        filename: file.originalname,
+        storedFilename: file.filename,
+        path: file.path,
+        size: file.size,
+        fileType: file.mimetype,
+        uploadedAt: new Date().toISOString()
+      };
+
+      uploadedFiles.push(fileInfo);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `${uploadedFiles.length} document(s) uploaded successfully`,
+      data: {
+        uploadedFiles,
+        count: uploadedFiles.length,
+        totalSize: uploadedFiles.reduce((total, file) => total + file.size, 0)
+      }
+    });
+
+  } catch (error) {
+    console.error('Error uploading documents:', error);
+
+    // Clean up any uploaded files if there was an error
+    if (req.files) {
+      req.files.forEach(file => {
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to upload documents',
+      error: error.message
+    });
+  }
+};
+
+const CHAT_APIS = {
+  getAllChats,
+  getChatById,
+  getUserChats,
+  appendPromptToChat,
+  appendResponseToChat,
+  createNewChat,
+  getLatestHistoryItem,
+  deleteChatById,
+  updateChatTitle,
+  uploadDocuments
+};
+
+export default CHAT_APIS;

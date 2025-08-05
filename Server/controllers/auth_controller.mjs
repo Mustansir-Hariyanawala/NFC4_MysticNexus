@@ -1,4 +1,4 @@
-import User from "../models/user.mjs";
+import User from "../models/user_model.mjs";
 import pbkdf2 from "crypto";
 
 // Function to handle user login via email

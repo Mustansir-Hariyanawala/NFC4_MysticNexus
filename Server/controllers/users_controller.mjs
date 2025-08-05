@@ -1,4 +1,4 @@
-import User from '../models/user.mjs';
+import User from '../models/user_model.mjs';
 import { generatePasswordHash } from '../utils/passwordUtils.mjs';
 
 // Get all users
