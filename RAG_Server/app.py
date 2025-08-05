@@ -1,7 +1,6 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from routes.main_router import main_router
-from routes.rag_router import rag_router
 from config.chromaDB import chroma_manager
 import logging
 import dotenv
@@ -18,7 +17,6 @@ CORS(app)  # Enable CORS for the entire app
 
 # Register blueprints
 app.register_blueprint(main_router, url_prefix='/api')
-app.register_blueprint(rag_router, url_prefix='/api/rag')
 
 @app.route('/')
 def home():
