@@ -11,6 +11,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+app.get('/hello', (req, res) => {
+  res.send('Hello from Express.js server!');
+})
 // Routes
 app.use('/api', mainRouter);
 
