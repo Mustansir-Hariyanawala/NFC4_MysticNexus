@@ -17,6 +17,11 @@ app.get('/', (req, res) => {
     res.send('Hello from the Backend!');
 });
 
+app.get('/hello', (req, res) => {
+    res.send('Hello');
+});
+
+
 // 6. Start the Server
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
