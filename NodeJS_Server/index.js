@@ -17,8 +17,8 @@ app.get('/', (req, res) => {
     res.send('Hello from the Backend!');
 });
 
-app.get('/hello', (req, res) => {
-    res.send('Hello');
+app.get('/helloWorld', (req, res) => {
+    res.send('Hello World from Express.js server!');
 });
 
 
