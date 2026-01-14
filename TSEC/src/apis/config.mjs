@@ -1,0 +1,1 @@
+export const BASE_URL = 'http://192.168.8.132:3000'; // Update this to your backend URL
